@@ -1,8 +1,8 @@
 import React from "react";
-import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
 
-const Login = () => {
+const Signup = () => {
   const {
     register,
     handleSubmit,
@@ -18,8 +18,28 @@ const Login = () => {
       <div className="hero-content p-0 flex-col">
         <div className="card flex-shrink-0 w-full max-w-sm bg-base-100">
           <div className="card-body">
-            <h1 className="text-center text-3xl">Login</h1>
+            <h1 className="text-center text-3xl">Sign Up</h1>
             <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Name</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="name"
+                  className="input input-bordered"
+                  {...register("name", {
+                    required: "This field is required",
+                    maxLength: {
+                      value: 20,
+                      message: "Name can't exceed 20 characters.",
+                    },
+                  })}
+                />
+                {errors.name && (
+                  <span className="text-error">{errors.name.message}</span>
+                )}
+              </div>
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">Email</span>
@@ -44,20 +64,33 @@ const Login = () => {
                   type="password"
                   placeholder="password"
                   className="input input-bordered"
-                  {...register("password", { required: true})}
+                  {...register("password", {
+                    required: "This field is required",
+                    minLength: {
+                      value: 8,
+                      message: "Password must be 8 characters long.",
+                    },
+                    pattern: {
+                      value:
+                        /(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{8}/,
+                      message: "Password must be strong",
+                    },
+                  })}
                 />
                 {errors.password && (
-                  <span className="text-error">This field is required.</span>
+                  <span className="text-error">{errors.password.message}</span>
                 )}
               </div>
               <div className="form-control mt-6">
-                <button type="submit" className="btn btn-accent text-white">Login</button>
+                <button type="submit" className="btn btn-accent text-white">
+                  Signup
+                </button>
               </div>
             </form>
             <p className="text-center mt-2">
-              New to Doctors Portal?{" "}
-              <Link to="/signup" className="text-secondary">
-                Create new account
+              Already have an account?{" "}
+              <Link to="/login" className="text-secondary">
+                Login
               </Link>
             </p>
             <div className="divider">OR</div>
@@ -71,4 +104,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;

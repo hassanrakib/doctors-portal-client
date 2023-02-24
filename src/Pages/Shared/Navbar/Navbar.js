@@ -1,22 +1,31 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../../contexts/AuthProvider";
 
 const navItems = [
-  { id: 1, to: "/", displayText: "Home" },
   { id: 2, to: "/about", displayText: "About" },
   { id: 3, to: "/appointment", displayText: "Appointment" },
   { id: 4, to: "/reviews", displayText: "Reviews" },
-  { id: 5, to: "/contact", displayText: "Contact Us" },
-  { id: 6, to: "/login", displayText: "Login" },
 ];
 const Navbar = () => {
+  const {user, logout} = useContext(AuthContext);
+
   const navListItems = (
     <React.Fragment>
+      {
+        user && <li><Link to="/dashboard">Dashboard</Link></li>
+      }
       {navItems.map((navItem) => (
         <li key={navItem.id}>
           <Link to={navItem.to}>{navItem.displayText}</Link>
         </li>
       ))}
+      {
+        user ?
+        <li><button className="btn btn-outline" onClick={logout}>Logout</button></li>        
+        :
+        <li><Link to='/login'>Login</Link></li>
+      }
     </React.Fragment>
   );
   return (

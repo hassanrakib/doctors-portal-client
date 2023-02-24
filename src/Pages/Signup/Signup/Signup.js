@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { AuthContext } from "../../../contexts/AuthProvider";
+import { toast } from "react-hot-toast";
 
 const Signup = () => {
   const {
@@ -9,8 +11,48 @@ const Signup = () => {
     formState: { errors },
   } = useForm();
 
+  const { createUser, updateUserProfile } = useContext(AuthContext);
+
+  const [signupError, setSignupError] = useState(null);
+
+
+  const handleUpdateUserProfile = (updatedProfile) => {
+    updateUserProfile(updatedProfile)
+      .then(() => {
+        console.log('User profile updated!');
+
+        // show success message
+        toast.success("User created successfully");
+      })
+      .catch(err => {
+        console.log(err);
+      })
+  }
+
   const onSubmit = (data) => {
-    console.log(data);
+
+    // clear the error for every submit
+    setSignupError(null);
+
+    // send the updatedProfile to handleUpdateUserProfile after successfull user creation
+    const updatedProfile = { displayName: data.name };
+
+    const email = data.email;
+    const password = data.password;
+
+    // sign up the user
+    createUser(email, password)
+      .then(userCredential => {
+        const user = userCredential.user;
+        console.log(user);
+
+        // update user profile
+        handleUpdateUserProfile(updatedProfile);
+      })
+      .catch(error => {
+        console.log(error);
+        setSignupError(error);
+      })
   };
 
   return (
@@ -73,18 +115,19 @@ const Signup = () => {
                     pattern: {
                       value:
                         /(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{8}/,
-                      message: "Password must be strong",
+                      message: "Password must have uppercase, lowercase, number and special character.",
                     },
                   })}
                 />
                 {errors.password && (
-                  <span className="text-error">{errors.password.message}</span>
+                  <span className="text-error text-xs">{errors.password.message}</span>
                 )}
               </div>
               <div className="form-control mt-6">
                 <button type="submit" className="btn btn-accent text-white">
-                  Signup
+                  Sign up
                 </button>
+                {signupError && <p className="text-xs text-error">{signupError.message}</p>}
               </div>
             </form>
             <p className="text-center mt-2">

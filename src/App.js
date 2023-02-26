@@ -14,7 +14,13 @@ const App = () => {
         <RouterProvider router={router} />
       </QueryClientProvider>
       {/* This component will render all toasts */}
-      <Toaster />
+      <Toaster
+        toastOptions={{
+          success: {
+            duration: 5000,
+          },
+        }}
+      />
     </div>
   );
 };

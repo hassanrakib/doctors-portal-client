@@ -1,10 +1,11 @@
 import React, { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../contexts/AuthProvider";
 import { toast } from "react-hot-toast";
 
 const Signup = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -23,6 +24,9 @@ const Signup = () => {
 
         // show success message
         toast.success("User created successfully");
+
+        // navigate to homepage after successfull signup
+        navigate("/", {replace: true});
       })
       .catch(err => {
         console.log(err);

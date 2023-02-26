@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
+import { toast } from "react-hot-toast";
+import { AuthContext } from "../../../contexts/AuthProvider";
 
-const BookingModal = ({ booking, setBooking, date }) => {
+const BookingModal = ({ booking, setBooking, date, refetch}) => {
+
+  const { user } = useContext(AuthContext);
   const { name, slots } = booking;
-  const handleBooking = e => {
+  const handleBooking = (e) => {
     e.preventDefault();
     const form = e.target;
     const slot = form.slot.value;
@@ -17,12 +21,30 @@ const BookingModal = ({ booking, setBooking, date }) => {
       patientName,
       phone,
       email,
-    }
-    console.log(bookingInformation);
+    };
 
-    // close the modal
-    setBooking(null);
-  }
+    // save booking to db
+    fetch("http://localhost:5000/bookings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bookingInformation),
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.insertedId) {
+          // give success message
+          toast.success(`Appointment at ${slot} in ${date} confirmed!`);
+
+          // close the modal
+          setBooking(null);
+
+          // after successful booking refetch the appointmentOptions
+          refetch();
+        }
+      });
+  };
   return (
     <>
       <input type="checkbox" id="bookingModal" className="modal-toggle" />
@@ -42,34 +64,43 @@ const BookingModal = ({ booking, setBooking, date }) => {
                 <input
                   type="text"
                   className="input input-bordered"
-                  defaultValue={date}
+                  value={date}
                   readOnly
+                  disabled
                 />
                 <select name="slot" className="select select-bordered w-full">
-                  {
-                    slots?.map(slot => <option key={Math.random()} value={slot}>{slot}</option>)
-                  }
+                  {slots?.map((slot) => (
+                    <option key={Math.random()} value={slot}>
+                      {slot}
+                    </option>
+                  ))}
                 </select>
                 <input
-                name="name"
+                  name="name"
                   type="text"
                   placeholder="Full Name"
                   className="input input-bordered"
+                  defaultValue={user?.displayName}
+                  disabled
                 />
                 <input
-                name="phone"
+                  name="phone"
                   type="text"
                   placeholder="Phone Number"
                   className="input input-bordered"
                 />
                 <input
-                name="email"
+                  name="email"
                   type="email"
                   placeholder="Email"
                   className="input input-bordered"
+                  defaultValue={user?.email}
+                  disabled
                 />
                 <div className="form-control mt-6">
-                  <button type="submit" className="btn btn-primary">Submit</button>
+                  <button type="submit" className="btn btn-primary">
+                    Submit
+                  </button>
                 </div>
               </form>
             </div>

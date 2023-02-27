@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../../contexts/AuthProvider";
 import { toast } from "react-hot-toast";
+import useToken from "../../../hooks/useToken";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -16,47 +17,64 @@ const Signup = () => {
 
   const [signupError, setSignupError] = useState(null);
 
+  // get the email of the created user
+  const [createdUserEmail, setEmail] = useState("");
+  const { token } = useToken(createdUserEmail);
 
-  const handleUpdateUserProfile = (updatedProfile) => {
-    updateUserProfile(updatedProfile)
-      .then(() => {
-        console.log('User profile updated!');
+  // if token exists
+  if (token) {
+    // navigate to homepage after successfull signup
+    navigate("/", { replace: true });
 
-        // show success message
-        toast.success("User created successfully");
-
-        // navigate to homepage after successfull signup
-        navigate("/", {replace: true});
-      })
-      .catch(err => {
-        console.log(err);
-      })
+    // show success message
+    toast.success("User created successfully");
   }
 
-  const onSubmit = (data) => {
+  const saveUserToDB = async (name, email) => {
+    return fetch("http://localhost:5000/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, email }),
+    }).then((res) => res.json());
+  };
 
+  const onSubmit = (data) => {
     // clear the error for every submit
     setSignupError(null);
 
-    // send the updatedProfile to handleUpdateUserProfile after successfull user creation
-    const updatedProfile = { displayName: data.name };
-
+    const name = data.name;
     const email = data.email;
     const password = data.password;
 
     // sign up the user
     createUser(email, password)
-      .then(userCredential => {
+      .then((userCredential) => {
         const user = userCredential.user;
         console.log(user);
 
-        // update user profile
-        handleUpdateUserProfile(updatedProfile);
+        // update user profile in firebase
+        updateUserProfile({ displayName: name });
       })
-      .catch(error => {
+      .then(() => {
+        // if updateUserProfile resolves
+        console.log("User profile updated!");
+
+        // save user to database
+        return saveUserToDB(name, email);
+      })
+      .then((result) => {
+        if (result.acknowledged) {
+          // if successfully saved to database
+          // set email to get token
+          setEmail(email);
+        }
+      })
+      .catch((error) => {
         console.log(error);
         setSignupError(error);
-      })
+      });
   };
 
   return (
@@ -119,19 +137,24 @@ const Signup = () => {
                     pattern: {
                       value:
                         /(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{8}/,
-                      message: "Password must have uppercase, lowercase, number and special character.",
+                      message:
+                        "Password must have uppercase, lowercase, number and special character.",
                     },
                   })}
                 />
                 {errors.password && (
-                  <span className="text-error text-xs">{errors.password.message}</span>
+                  <span className="text-error text-xs">
+                    {errors.password.message}
+                  </span>
                 )}
               </div>
               <div className="form-control mt-6">
                 <button type="submit" className="btn btn-accent text-white">
                   Sign up
                 </button>
-                {signupError && <p className="text-xs text-error">{signupError.message}</p>}
+                {signupError && (
+                  <p className="text-xs text-error">{signupError.message}</p>
+                )}
               </div>
             </form>
             <p className="text-center mt-2">

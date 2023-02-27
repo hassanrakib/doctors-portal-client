@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../../../contexts/AuthProvider";
 
 const navItems = [
@@ -8,31 +8,45 @@ const navItems = [
   { id: 4, to: "/reviews", displayText: "Reviews" },
 ];
 const Navbar = () => {
-  const {user, logout} = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
+
+  const location = useLocation();
+  const pathname = location.pathname;
 
   const navListItems = (
     <React.Fragment>
-      {
-        user && <li><Link to="/dashboard">Dashboard</Link></li>
-      }
+      {user && (
+        <li>
+          <Link to="/dashboard">Dashboard</Link>
+        </li>
+      )}
       {navItems.map((navItem) => (
         <li key={navItem.id}>
           <Link to={navItem.to}>{navItem.displayText}</Link>
         </li>
       ))}
-      {
-        user ?
-        <li><button className="btn btn-outline" onClick={logout}>Logout</button></li>        
-        :
-        <li><Link to='/login'>Login</Link></li>
-      }
+      {user ? (
+        <li>
+          <button className="btn btn-outline" onClick={logout}>
+            Logout
+          </button>
+        </li>
+      ) : (
+        <li>
+          <Link to="/login">Login</Link>
+        </li>
+      )}
     </React.Fragment>
   );
   return (
     <div className="navbar bg-base-100">
       <div className="navbar-start">
         <div className="dropdown">
-          <label tabIndex={0} className="btn btn-ghost lg:hidden">
+          <label
+            htmlFor={pathname === "/dashboard" ? "dashboardDrawer" : ""}
+            tabIndex={0}
+            className="btn btn-ghost lg:hidden"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5"
@@ -50,7 +64,9 @@ const Navbar = () => {
           </label>
           <ul
             tabIndex={0}
-            className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+            className={`menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52 ${
+              pathname === "/dashboard" ? "hidden" : ""
+            }`}
           >
             {navListItems}
           </ul>

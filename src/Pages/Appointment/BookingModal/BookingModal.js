@@ -33,7 +33,7 @@ const BookingModal = ({ booking, setBooking, date, refetch}) => {
     })
       .then((res) => res.json())
       .then((result) => {
-        if (result.insertedId) {
+        if (result.acknowledged) {
           // give success message
           toast.success(`Appointment at ${slot} in ${date} confirmed!`);
 
@@ -42,6 +42,9 @@ const BookingModal = ({ booking, setBooking, date, refetch}) => {
 
           // after successful booking refetch the appointmentOptions
           refetch();
+        } else {
+          // if booking is declined from the backend
+          toast.error(result.message);
         }
       });
   };

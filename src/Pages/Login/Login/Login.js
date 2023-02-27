@@ -2,19 +2,31 @@ import React, { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../contexts/AuthProvider";
+import useToken from "../../../hooks/useToken";
 
 const Login = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const {login} = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const [loginError, setLoginError] = useState(null);
+
+  const [loggedInUserEmail, setLoggedInUserEmail] = useState("");
+  // useToken observes when the email changes
+  const { token } = useToken(loggedInUserEmail);
+
+  // if token found
+  if (token) {
+    // redirect user to the destination page
+    navigate(from, { replace: true });
+  }
 
   const onSubmit = (data) => {
     // set login error for next submit
@@ -25,18 +37,17 @@ const Login = () => {
 
     // login
     login(email, password)
-      .then(userCredential => {
+      .then((userCredential) => {
         const user = userCredential.user;
         console.log(user);
-
-        // redirect user to the destination page
-        navigate(from, {replace: true});
+        // set email to get the token for the user
+        setLoggedInUserEmail(user.email);
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
         // set login error
         setLoginError(error);
-      })
+      });
   };
 
   return (
@@ -70,15 +81,19 @@ const Login = () => {
                   type="password"
                   placeholder="password"
                   className="input input-bordered"
-                  {...register("password", { required: true})}
+                  {...register("password", { required: true })}
                 />
                 {errors.password && (
                   <span className="text-error">This field is required.</span>
                 )}
               </div>
               <div className="form-control mt-6">
-                <button type="submit" className="btn btn-accent text-white">Login</button>
-                {loginError && <p className="text-xs text-error">{loginError.message}</p>}
+                <button type="submit" className="btn btn-accent text-white">
+                  Login
+                </button>
+                {loginError && (
+                  <p className="text-xs text-error">{loginError.message}</p>
+                )}
               </div>
             </form>
             <p className="text-center mt-2">

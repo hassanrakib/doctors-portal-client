@@ -5,7 +5,7 @@ import Spinner from "../../Shared/Spinner/Spinner";
 
 const MyAppointments = () => {
   const {
-    user: { email },
+    user: { email }, logout
   } = useContext(AuthContext);
 
   const { data: bookings = [], isLoading } = useQuery({
@@ -16,7 +16,15 @@ const MyAppointments = () => {
           authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         }
       })
-        .then((res) => res.json()),
+        .then((res) => {
+          // if the token is invalid for some reason
+          if (res.status === 403 || res.status === 401) {
+            logout();
+            return [];
+          } else {
+            return res.json();
+          }
+        }),
   });
 
   if (isLoading) {

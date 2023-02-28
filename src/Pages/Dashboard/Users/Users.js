@@ -38,7 +38,7 @@ const Users = () => {
   }
   return (
     <div>
-      <h1 className="text-3xl">All Users</h1>
+      <h1 className="text-3xl mb-4">All Users</h1>
       {/* show users */}
       <div className="overflow-x-auto">
         <table className="table table-zebra w-full">

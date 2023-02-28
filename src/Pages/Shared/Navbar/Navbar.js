@@ -43,7 +43,7 @@ const Navbar = () => {
       <div className="navbar-start">
         <div className="dropdown">
           <label
-            htmlFor={pathname === "/dashboard" ? "dashboardDrawer" : ""}
+            htmlFor={pathname.includes("/dashboard") ? "dashboardDrawer" : ""}
             tabIndex={0}
             className="btn btn-ghost lg:hidden"
           >
@@ -65,7 +65,7 @@ const Navbar = () => {
           <ul
             tabIndex={0}
             className={`menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52 ${
-              pathname === "/dashboard" ? "hidden" : ""
+              pathname.includes("/dashboard") ? "hidden" : ""
             }`}
           >
             {navListItems}

@@ -17,7 +17,7 @@ const Users = () => {
   });
 
   const handleMakeAdmin = (id, email) => {
-    fetch(`http://localhost:5000/users/make-admin/${id}`, {
+    fetch(`http://localhost:5000/users/admin/${id}`, {
       method: "PUT",
       headers: {
         authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -26,7 +26,7 @@ const Users = () => {
       .then((res) => res.json())
       .then((result) => {
         if (result.acknowledged) {
-          toast.success(`${email} is given admin rights.`);
+          toast.success(`${email} is given the admin rights.`);
           // if a user document is modified refetch the users
           refetch();
         }

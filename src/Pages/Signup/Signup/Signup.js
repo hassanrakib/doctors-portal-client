@@ -18,7 +18,7 @@ const Signup = () => {
   const [signupError, setSignupError] = useState(null);
 
   // get the email of the created user
-  const [createdUserEmail, setEmail] = useState("");
+  const [createdUserEmail, setCreatedUserEmail] = useState("");
   const { token } = useToken(createdUserEmail);
 
   // if token exists
@@ -68,7 +68,7 @@ const Signup = () => {
         if (result.acknowledged) {
           // if successfully saved to database
           // set email to get token
-          setEmail(email);
+          setCreatedUserEmail(email);
         }
       })
       .catch((error) => {

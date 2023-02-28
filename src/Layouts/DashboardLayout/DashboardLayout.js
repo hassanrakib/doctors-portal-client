@@ -1,14 +1,19 @@
+import { useContext } from "react";
 import { Link, Outlet } from "react-router-dom";
+import { AuthContext } from "../../contexts/AuthProvider";
+import useAdmin from "../../hooks/useAdmin";
 import Navbar from "../../Pages/Shared/Navbar/Navbar";
 
 const DashboardLayout = () => {
+  const { user } = useContext(AuthContext);
+  const { isAdmin } = useAdmin(user?.email);
   return (
     <div>
       <Navbar />
       <div className="drawer drawer-mobile">
         <input id="dashboardDrawer" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content p-4">
-            {/* main content goes here */}
+          {/* main content goes here */}
           <Outlet />
         </div>
         <div className="drawer-side">
@@ -17,9 +22,13 @@ const DashboardLayout = () => {
             <li>
               <Link to="/dashboard">My Appointments</Link>
             </li>
-            <li>
-              <Link to="/dashboard/users">All Users</Link>
-            </li>
+            {isAdmin && (
+              <>
+                <li>
+                  <Link to="/dashboard/users">All Users</Link>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>

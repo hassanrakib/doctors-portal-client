@@ -23,11 +23,11 @@ const Signup = () => {
 
   // if token exists
   if (token) {
-    // navigate to homepage after successfull signup
-    navigate("/", { replace: true });
-
     // show success message
     toast.success("User created successfully");
+    
+    // navigate to homepage after successfull signup
+    navigate("/", { replace: true });
   }
 
   const saveUserToDB = async (name, email) => {

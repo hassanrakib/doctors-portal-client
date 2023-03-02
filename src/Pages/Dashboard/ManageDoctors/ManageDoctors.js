@@ -40,7 +40,7 @@ const ManageDoctors = () => {
       .then((res) => res.json())
       .then((result) => {
         if (result.acknowledged) {
-          toast.success("Deletion successful");
+          toast.success(`${doctor.name} is deleted.`);
           //   refetch after deleting a doctor
           refetch();
         }
@@ -105,8 +105,9 @@ const ManageDoctors = () => {
       {doctorToDelete && (
         <ConfirmationModal
           title="Are you sure you want to delete?"
-          message={`If you delete "${doctorToDelete.name}" whoes email address is "${doctorToDelete.email}", the action can't be undone.`}
+          message={`Deleting ${doctorToDelete.name} can't be undone.`}
           modalData={doctorToDelete}
+          successButtonName="Delete"
           successAction={handleDeleteDoctor}
           closeModal={() => setDoctorToDelete(null)}
         />

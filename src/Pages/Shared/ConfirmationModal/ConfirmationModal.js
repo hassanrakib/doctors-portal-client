@@ -1,4 +1,11 @@
-const ConfirmationModal = ({ title, message, modalData, successAction, closeModal }) => {
+const ConfirmationModal = ({
+  title,
+  message,
+  modalData,
+  successButtonName,
+  successAction,
+  closeModal,
+}) => {
   return (
     <div>
       <input type="checkbox" id="confirmationModal" className="modal-toggle" />
@@ -7,8 +14,12 @@ const ConfirmationModal = ({ title, message, modalData, successAction, closeModa
           <h3 className="font-bold text-lg">{title}</h3>
           <p className="py-4">{message}</p>
           <div className="modal-action">
-            <label onClick={() => successAction(modalData)} htmlFor="confirmationModal" className="btn">
-              Delete
+            <label
+              onClick={() => successAction(modalData)}
+              htmlFor="confirmationModal"
+              className="btn"
+            >
+              {successButtonName}
             </label>
             <button onClick={closeModal} className="btn btn-outline">
               Cancel

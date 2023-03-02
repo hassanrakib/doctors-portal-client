@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { useContext } from "react";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../../../contexts/AuthProvider";
 import Spinner from "../../Shared/Spinner/Spinner";
 
 const MyAppointments = () => {
   const {
-    user: { email }, logout
+    user: { email },
+    logout,
   } = useContext(AuthContext);
 
   const { data: bookings = [], isLoading } = useQuery({
@@ -14,21 +16,20 @@ const MyAppointments = () => {
       fetch(`http://localhost:5000/bookings?email=${email}`, {
         headers: {
           authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }).then((res) => {
+        // if the token is invalid for some reason
+        if (res.status === 403 || res.status === 401) {
+          logout();
+          return [];
+        } else {
+          return res.json();
         }
-      })
-        .then((res) => {
-          // if the token is invalid for some reason
-          if (res.status === 403 || res.status === 401) {
-            logout();
-            return [];
-          } else {
-            return res.json();
-          }
-        }),
+      }),
   });
 
   if (isLoading) {
-    return <Spinner />
+    return <Spinner />;
   }
 
   return (
@@ -45,6 +46,7 @@ const MyAppointments = () => {
               <th>Service</th>
               <th>Date</th>
               <th>Time</th>
+              <th>Payment</th>
             </tr>
           </thead>
           <tbody>
@@ -55,6 +57,15 @@ const MyAppointments = () => {
                 <td>{booking.treatment}</td>
                 <td>{booking.appointmentDate}</td>
                 <td>{booking.slot}</td>
+                <td>
+                  {!booking.paid ? (
+                    <Link to={`/dashboard/payment/${booking._id}`}>
+                      <button className="btn btn-xs btn-accent">Pay</button>
+                    </Link>
+                  ) : (
+                    <p className="text-secondary">Paid</p>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
